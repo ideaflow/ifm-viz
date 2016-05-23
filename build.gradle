@@ -1,0 +1,47 @@
+buildscript {
+	ext {
+		springBootVersion = "1.2.3.RELEASE"
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+//		classpath "com.bancvue:gradle-core:1+"
+		classpath "net.jokubasdargis.buildtimer:gradle-plugin:0.1.1"
+	}
+}
+
+apply plugin: "idea"//com.bancvue.core-oss"
+apply plugin: "groovy"
+apply plugin: "spring-boot"
+apply plugin: "net.jokubasdargis.build-timer"
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+}
+
+dependencies {
+	compile "org.springframework.boot:spring-boot-starter-web"
+	compile "org.springframework.boot:spring-boot-starter-actuator"
+	compile "org.springframework.boot:spring-boot-starter-jersey"
+    compile 'org.springframework.boot:spring-boot-starter-freemarker'
+    compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.4.0"
+	compile "org.codehaus.groovy:groovy-all:2.4.3"
+
+	// Utilities
+	compile "com.google.guava:guava:18.0"
+	compile 'joda-time:joda-time:2.3'
+	compile "org.projectlombok:lombok:1.16.4"
+
+	testCompile 'org.reflections:reflections:0.9.9-RC1'
+	testCompile "org.fluttercode.datafactory:datafactory:0.8"
+	testCompile "org.codehaus.groovy.modules.http-builder:http-builder:0.7.1"
+	testCompile("org.spockframework:spock-spring:1.0-groovy-2.4") {
+		exclude group: "org.codehaus.groovy"
+	}
+	testCompile "org.springframework.boot:spring-boot-starter-test"
+	testCompile "commons-io:commons-io:2.4"
+}
