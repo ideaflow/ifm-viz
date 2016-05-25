@@ -1,5 +1,5 @@
 
-
+//CONSTANTS for Timeline Window Size
 
 var sideMargin = 40;
 var bottomMargin = 30;
@@ -7,6 +7,7 @@ var bandMargin = 20;
 var topMargin = bottomMargin;
 var height = 180;
 var width = 800;
+
 var isFocused = false;
 
 var timelineWindow;
@@ -50,7 +51,6 @@ function drawTimeline(timelineData) {
     });
 
     var firstSegment = timelineData.timelineSegments[0];
-
     var secondsPerUnit = getSecondsPerUnit(firstSegment);
 
     drawUngroupedTimebands(stage, firstSegment, secondsPerUnit);
@@ -65,6 +65,123 @@ function drawTimeline(timelineData) {
     //drawStretchControls(stage);
     //initIdIndexedTimelineData(timelineData);
 }
+
+
+function drawUngroupedTimebands(stage, firstSegment, secondsPerUnit) {
+    var layer = new Kinetic.Layer();
+
+    firstSegment.ideaFlowBands.forEach(function(band) {
+        if (band.type != "PROGRESS") {
+
+            var colorBand = drawBand(layer, band, secondsPerUnit);
+            var bandInfo = { data: band, rect: colorBand };
+
+            colorBand.on('mouseover touchstart', function() { highlightBand(bandInfo) });
+            colorBand.on('mouseout touchend', function() { restoreBand(bandInfo) });
+        }
+    });
+
+    stage.add(layer);
+}
+
+function drawGroupedTimebands(stage, firstSegment, secondsPerUnit) {
+    firstSegment.timeBandGroups.forEach(function(group) {
+        var groupLayer = new Kinetic.Layer();
+
+        var groupInfo = { bandInfos: [], layer: groupLayer };
+
+        group.linkedTimeBands.forEach(function(band) {
+            if (band.type != "PROGRESS") {
+                var colorBand = drawBand(groupLayer, band, secondsPerUnit);
+                var bandInfo = { data: band, rect: colorBand };
+                groupInfo.bandInfos.push(bandInfo);
+            }
+        });
+
+        groupLayer.on('mouseover touchstart', function() { highlightBandGroup(groupInfo) });
+        groupLayer.on('mouseout touchend', function() { restoreBandGroup(groupInfo) });
+
+        stage.add(groupLayer);
+    });
+}
+
+
+
+function highlightBand(bandInfo) {
+    bandInfo.rect.setFill(lookupBandColors(bandInfo.data.type)[1]);
+    bandInfo.rect.getLayer().draw();
+}
+
+function restoreBand(bandInfo) {
+    bandInfo.rect.setFill(lookupBandColors(bandInfo.data.type)[0]);
+    bandInfo.rect.getLayer().draw();
+}
+
+function highlightBandGroup(groupInfo) {
+    groupInfo.bandInfos.forEach(function(bandInfo) {
+        bandInfo.rect.setFill(lookupBandColors(bandInfo.data.type)[1])
+    });
+    groupInfo.layer.draw();
+
+}
+
+function restoreBandGroup(groupInfo) {
+    groupInfo.bandInfos.forEach(function(bandInfo) {
+        bandInfo.rect.setFill(lookupBandColors(bandInfo.data.type)[0])
+    });
+    groupInfo.layer.draw();
+}
+
+function drawBand(layer, band, secondsPerUnit) {
+    var offset = Math.round(band.relativeStart / secondsPerUnit) + sideMargin;
+    var size = Math.round(band.duration / secondsPerUnit);
+
+    var colorBand = new Kinetic.Rect({
+        x: offset,
+        y: topMargin + bandMargin,
+        width: size,
+        height: height - bottomMargin - topMargin - bandMargin,
+        fill: lookupBandColors(band.type)[0],
+        stroke: lookupBandColors(band.type)[1],
+        strokeWidth: 1
+    });
+
+    layer.add(colorBand);
+    return colorBand;
+}
+
+
+
+
+
+
+function lookupBandColors(bandType) {
+    if (bandType == 'CONFLICT') {
+        return ['#ff0078', '#FF90D1', '#FFDEF6']
+    } else if (bandType == 'LEARNING') {
+        return ['#520ce8', '#9694E8', '#EDE2FD']
+    } else if (bandType == 'REWORK') {
+        return ['#ffcb01', '#FFEA7C', '#FFF5A7']
+    } else {
+        throw "Unable to find color for bandType: "+bandType
+    }
+}
+
+function formatShort(duration) {
+    var d = Number(duration);
+    var h = Math.floor(d / 3600);
+    var m = Math.floor(d % 3600 / 60);
+    return ( h + ":" + (m < 10 ? "0" : "") + m);
+}
+
+function getEndOfTimeline(segment) {
+    return segment.relativeStart + segment.duration;
+}
+
+function getSecondsPerUnit(segment) {
+    return (getEndOfTimeline(segment) / (width - (2 * sideMargin)));
+}
+
 
 function drawMainTimeline(stage, startTick, endTick) {
     var layer = new Kinetic.Layer();
@@ -110,95 +227,6 @@ function createMainLine(tickHeight) {
         lineJoin: 'round'
     });
 }
-
-function drawUngroupedTimebands(stage, firstSegment, secondsPerUnit) {
-    var layer = new Kinetic.Layer();
-
-    firstSegment.ideaFlowBands.forEach(function(band) {
-        if (band.type != "PROGRESS") {
-            var colorBand = drawBand(layer, band, secondsPerUnit);
-        }
-    });
-
-    stage.add(layer);
-}
-
-function drawGroupedTimebands(stage, firstSegment, secondsPerUnit) {
-
-
-    firstSegment.timeBandGroups.forEach(function(group) {
-        var groupLayer = new Kinetic.Layer();
-
-        group.linkedTimeBands.forEach(function(band) {
-            if (band.type != "PROGRESS") {
-                var colorBand = drawBand(groupLayer, band, secondsPerUnit);
-            }
-        });
-
-        stage.add(groupLayer);
-    });
-
-
-}
-
-
-
-function drawBand(layer, band, secondsPerUnit) {
-    var offset = Math.round(band.relativeStart / secondsPerUnit) + sideMargin;
-    var size = Math.round(band.duration / secondsPerUnit);
-
-    var colorBand = new Kinetic.Rect({
-        x: offset,
-        y: topMargin + bandMargin,
-        width: size,
-        height: height - bottomMargin - topMargin - bandMargin,
-        fill: lookupBandColors(band.type)[0],
-        stroke: lookupBandColors(band.type)[1],
-        strokeWidth: 1
-    });
-
-    colorBand.on('mouseover touchstart', function () {
-            this.setFill(lookupBandColors(band.type)[1]);
-            layer.draw();
-    });
-
-    colorBand.on('mouseout touchend', function () {
-            this.setFill(lookupBandColors(band.type)[0]);
-            layer.draw();
-    });
-
-    layer.add(colorBand);
-    return colorBand;
-}
-
-
-function lookupBandColors(bandType) {
-    if (bandType == 'CONFLICT') {
-        return ['#ff0078', '#FF90D1', '#FFDEF6']
-    } else if (bandType == 'LEARNING') {
-        return ['#520ce8', '#9694E8', '#EDE2FD']
-    } else if (bandType == 'REWORK') {
-        return ['#ffcb01', '#FFEA7C', '#FFF5A7']
-    } else {
-        throw "Unable to find color for bandType: "+bandType
-    }
-}
-
-function formatShort(duration) {
-    var d = Number(duration);
-    var h = Math.floor(d / 3600);
-    var m = Math.floor(d % 3600 / 60);
-    return ( h + ":" + (m < 10 ? "0" : "") + m);
-}
-
-function getEndOfTimeline(segment) {
-    return segment.relativeStart + segment.duration;
-}
-
-function getSecondsPerUnit(segment) {
-    return (getEndOfTimeline(segment) / (width - (2 * sideMargin)));
-}
-
 
 
 //############ OLD STUFF #############
