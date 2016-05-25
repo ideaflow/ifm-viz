@@ -28,12 +28,11 @@ var indexedEvents;
 var indexedBands;
 
 function renderTimeline() {
-    alert("hello");
     $.ajax({
         type: 'GET',
         crossDomain : true,
-        url: 'http://localhost:8080/stubtimeline/task/basic',
-        success: displayTimeline,
+        url: 'http://localhost:8080/stubtimeline/task/trial',
+        success: drawTimeline,
         error: handleError
     });
 }
@@ -42,19 +41,170 @@ function handleError(err) {
     console.log("AJAX error in request: " + JSON.stringify(err, null, 2));
 }
 
+function drawTimeline(timelineData) {
 
+    stage = new Kinetic.Stage({
+        container: 'timelineHolder',
+        width: width,
+        height: height
+    });
 
-function displayTimeline(data) {
-    for (var name in data) {
-        if (data.hasOwnProperty(name)) {
-            console.log(name + ":" + data[name]);
+    var firstSegment = timelineData.timelineSegments[0];
+
+    var secondsPerUnit = getSecondsPerUnit(firstSegment);
+
+    drawUngroupedTimebands(stage, firstSegment, secondsPerUnit);
+    drawGroupedTimebands(stage, firstSegment, secondsPerUnit);
+
+    drawMainTimeline(stage, formatShort(0), formatShort(getEndOfTimeline(firstSegment)));
+
+    //drawTimebandsLayer(stage, data.timeBands, secondsPerUnit);
+    //drawMainTimeline(stage, data);
+    //drawEventsLayer(stage, data.events, secondsPerUnit);
+    //drawWindow(stage);
+    //drawStretchControls(stage);
+    //initIdIndexedTimelineData(timelineData);
+}
+
+function drawMainTimeline(stage, startTick, endTick) {
+    var layer = new Kinetic.Layer();
+    var tickHeight = 10;
+    var tickMargin = 5;
+    var startTickLabel = new Kinetic.Text({
+        x: sideMargin - tickMargin,
+        y: height - bottomMargin,
+        text: startTick,
+        fontSize: 13,
+        align: 'right',
+        fontFamily: 'Calibri',
+        fill: 'black'
+    });
+    startTickLabel.setOffset({x: startTickLabel.getWidth()});
+
+    var endTickLabel = new Kinetic.Text({
+        x: width - sideMargin + tickMargin,
+        y: height - bottomMargin,
+        text: endTick,
+        fontSize: 13,
+        fontFamily: 'Calibri',
+        fill: 'black'
+    });
+
+    layer.add(createMainLine(tickHeight));
+    layer.add(startTickLabel);
+    layer.add(endTickLabel);
+    stage.add(layer);
+}
+
+function createMainLine(tickHeight) {
+    return new Kinetic.Line({
+        points: [
+            [sideMargin, height - bottomMargin + tickHeight],
+            [sideMargin, height - bottomMargin],
+            [width - sideMargin, height - bottomMargin],
+            [width - sideMargin, height - bottomMargin + tickHeight]
+        ],
+        stroke: 'black',
+        strokeWidth: 3,
+        lineCap: 'square',
+        lineJoin: 'round'
+    });
+}
+
+function drawUngroupedTimebands(stage, firstSegment, secondsPerUnit) {
+    var layer = new Kinetic.Layer();
+
+    firstSegment.ideaFlowBands.forEach(function(band) {
+        if (band.type != "PROGRESS") {
+            var colorBand = drawBand(layer, band, secondsPerUnit);
         }
-    }
+    });
+
+    stage.add(layer);
+}
+
+function drawGroupedTimebands(stage, firstSegment, secondsPerUnit) {
+
+
+    firstSegment.timeBandGroups.forEach(function(group) {
+        var groupLayer = new Kinetic.Layer();
+
+        group.linkedTimeBands.forEach(function(band) {
+            if (band.type != "PROGRESS") {
+                var colorBand = drawBand(groupLayer, band, secondsPerUnit);
+            }
+        });
+
+        stage.add(groupLayer);
+    });
+
 
 }
 
 
+
+function drawBand(layer, band, secondsPerUnit) {
+    var offset = Math.round(band.relativeStart / secondsPerUnit) + sideMargin;
+    var size = Math.round(band.duration / secondsPerUnit);
+
+    var colorBand = new Kinetic.Rect({
+        x: offset,
+        y: topMargin + bandMargin,
+        width: size,
+        height: height - bottomMargin - topMargin - bandMargin,
+        fill: lookupBandColors(band.type)[0],
+        stroke: lookupBandColors(band.type)[1],
+        strokeWidth: 1
+    });
+
+    colorBand.on('mouseover touchstart', function () {
+            this.setFill(lookupBandColors(band.type)[1]);
+            layer.draw();
+    });
+
+    colorBand.on('mouseout touchend', function () {
+            this.setFill(lookupBandColors(band.type)[0]);
+            layer.draw();
+    });
+
+    layer.add(colorBand);
+    return colorBand;
+}
+
+
+function lookupBandColors(bandType) {
+    if (bandType == 'CONFLICT') {
+        return ['#ff0078', '#FF90D1', '#FFDEF6']
+    } else if (bandType == 'LEARNING') {
+        return ['#520ce8', '#9694E8', '#EDE2FD']
+    } else if (bandType == 'REWORK') {
+        return ['#ffcb01', '#FFEA7C', '#FFF5A7']
+    } else {
+        throw "Unable to find color for bandType: "+bandType
+    }
+}
+
+function formatShort(duration) {
+    var d = Number(duration);
+    var h = Math.floor(d / 3600);
+    var m = Math.floor(d % 3600 / 60);
+    return ( h + ":" + (m < 10 ? "0" : "") + m);
+}
+
+function getEndOfTimeline(segment) {
+    return segment.relativeStart + segment.duration;
+}
+
+function getSecondsPerUnit(segment) {
+    return (getEndOfTimeline(segment) / (width - (2 * sideMargin)));
+}
+
+
+
 //############ OLD STUFF #############
+
+
+
 
 function refreshTimeline() {
     $.ajax({
@@ -141,27 +291,6 @@ function isElementVisibleInContainer(elementSelector, containerSelector) {
     return isVisible
 }
 
-function getSecondsPerUnit() {
-    return (timelineData.end.offset / (width - (2 * sideMargin)));
-}
-
-function drawTimeline(data) {
-
-    timelineData = data;
-    stage = new Kinetic.Stage({
-        container: 'timelineHolder',
-        width: width,
-        height: height
-    });
-
-    var secondsPerUnit = getSecondsPerUnit();
-    drawTimebandsLayer(stage, data.timeBands, secondsPerUnit);
-    drawMainTimeline(stage, data);
-    drawEventsLayer(stage, data.events, secondsPerUnit);
-    drawWindow(stage);
-    drawStretchControls(stage);
-    initIdIndexedTimelineData(timelineData);
-}
 
 function initIdIndexedTimelineData(data) {
     indexedTimeEntries = new Array();
@@ -282,50 +411,6 @@ function createStretcher(xPosition) {
     return stretcher;
 }
 
-function drawMainTimeline(stage, data) {
-    var layer = new Kinetic.Layer();
-    var tickHeight = 10;
-    var tickMargin = 5;
-    var startTickLabel = new Kinetic.Text({
-        x: sideMargin - tickMargin,
-        y: height - bottomMargin,
-        text: data.start.shortTime,
-        fontSize: 13,
-        align: 'right',
-        fontFamily: 'Calibri',
-        fill: 'black'
-    });
-    startTickLabel.setOffset({x: startTickLabel.getWidth()});
-
-    var endTickLabel = new Kinetic.Text({
-        x: width - sideMargin + tickMargin,
-        y: height - bottomMargin,
-        text: data.end.shortTime,
-        fontSize: 13,
-        fontFamily: 'Calibri',
-        fill: 'black'
-    });
-
-    layer.add(createMainLine(tickHeight));
-    layer.add(startTickLabel);
-    layer.add(endTickLabel);
-    stage.add(layer);
-}
-
-function createMainLine(tickHeight) {
-    return new Kinetic.Line({
-        points: [
-            [sideMargin, height - bottomMargin + tickHeight],
-            [sideMargin, height - bottomMargin],
-            [width - sideMargin, height - bottomMargin],
-            [width - sideMargin, height - bottomMargin + tickHeight]
-        ],
-        stroke: 'black',
-        strokeWidth: 3,
-        lineCap: 'square',
-        lineJoin: 'round'
-    });
-}
 
 function drawEventsLayer(stage, events, secondsPerUnit) {
     var layer = new Kinetic.Layer();
@@ -432,17 +517,7 @@ function drawTimeband(layer, band, secondsPerUnit) {
     return colorBand;
 }
 
-function lookupBandColors(bandType) {
-    if (bandType == 'conflict') {
-        return ['#ff0078', '#FF90D1', '#FFDEF6']
-    } else if (bandType == 'learning') {
-        return ['#520ce8', '#9694E8', '#EDE2FD']
-    } else if (bandType == 'rework') {
-        return ['#ffcb01', '#FFEA7C', '#FFF5A7']
-    } else {
-        throw "Unable to find color for bandType: "+bandType
-    }
-}
+
 
 function resetColorBands() {
     isFocused = false;
