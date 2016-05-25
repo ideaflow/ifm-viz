@@ -72,12 +72,7 @@ function drawUngroupedTimebands(stage, firstSegment, secondsPerUnit) {
 
     firstSegment.ideaFlowBands.forEach(function(band) {
         if (band.type != "PROGRESS") {
-
-            var colorBand = drawBand(layer, band, secondsPerUnit);
-            var bandInfo = { data: band, rect: colorBand };
-
-            colorBand.on('mouseover touchstart', function() { highlightBand(bandInfo) });
-            colorBand.on('mouseout touchend', function() { restoreBand(bandInfo) });
+            drawTimebandGroup(stage, [band], secondsPerUnit);
         }
     });
 
@@ -86,35 +81,32 @@ function drawUngroupedTimebands(stage, firstSegment, secondsPerUnit) {
 
 function drawGroupedTimebands(stage, firstSegment, secondsPerUnit) {
     firstSegment.timeBandGroups.forEach(function(group) {
-        var groupLayer = new Kinetic.Layer();
-
-        var groupInfo = { bandInfos: [], layer: groupLayer };
-
-        group.linkedTimeBands.forEach(function(band) {
-            if (band.type != "PROGRESS") {
-                var colorBand = drawBand(groupLayer, band, secondsPerUnit);
-                var bandInfo = { data: band, rect: colorBand };
-                groupInfo.bandInfos.push(bandInfo);
-            }
-        });
-
-        groupLayer.on('mouseover touchstart', function() { highlightBandGroup(groupInfo) });
-        groupLayer.on('mouseout touchend', function() { restoreBandGroup(groupInfo) });
-
-        stage.add(groupLayer);
+        drawTimebandGroup(stage, group.linkedTimeBands, secondsPerUnit);
     });
 }
 
+function drawTimebandGroup(stage, bands, secondsPerUnit) {
+    var groupLayer = new Kinetic.Layer();
+    var groupInfo = { bandInfos: [], layer: groupLayer };
 
+    bands.forEach(function(band) {
+        if (band.type != "PROGRESS") {
+            var colorBand = drawBand(groupLayer, band, secondsPerUnit);
+            var bandInfo = { data: band, rect: colorBand };
+            groupInfo.bandInfos.push(bandInfo);
 
-function highlightBand(bandInfo) {
-    bandInfo.rect.setFill(lookupBandColors(bandInfo.data.type)[1]);
-    bandInfo.rect.getLayer().draw();
-}
+            band.nestedBands.forEach(function(nestedBand) {
+                var colorBand = drawBand(groupLayer, nestedBand, secondsPerUnit);
+                var bandInfo = { data: nestedBand, rect: colorBand };
+                groupInfo.bandInfos.push(bandInfo);
+            });
+        }
+    });
 
-function restoreBand(bandInfo) {
-    bandInfo.rect.setFill(lookupBandColors(bandInfo.data.type)[0]);
-    bandInfo.rect.getLayer().draw();
+    groupLayer.on('mouseover touchstart', function() { highlightBandGroup(groupInfo) });
+    groupLayer.on('mouseout touchend', function() { restoreBandGroup(groupInfo) });
+
+    stage.add(groupLayer);
 }
 
 function highlightBandGroup(groupInfo) {
