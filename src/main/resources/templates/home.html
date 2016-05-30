@@ -20,17 +20,51 @@
 <head>
 
     <script type="text/javascript" src="../visualizer/js/jquery.min.js"></script>
-    <script src="../visualizer/js/ideaflow.js"></script>
     <script src="../visualizer/js/lib/kinetic-v4.7.4.min.js"></script>
 
+    <link rel="stylesheet" type="text/css" href="../visualizer/css/reset/reset.css"/>
+    <link rel="stylesheet" type="text/css" href="../visualizer/css/normalize/normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="../visualizer/css/html5boilerplate/html5boilerplate.css"/>
 
+    <link rel="stylesheet" type="text/css" href="../visualizer/css/main.css"/>
+
+    <script src="../visualizer/js/ideaflow.js"></script>
+    <script src="../visualizer/js/timeline-tree.js"></script>
 
 </head>
 <body>
+<div class="header">
+    <div class="nav option1">
+        <ul>
+            <li class="active"><a href="#">Nov 4th, 2015</a></li>
+            <li><a href="#">My Task Description</a></li>
+        </ul>
+        <img src="../visualizer/images/flow.svg" alt="Idea Flow"/>
+    </div>
+</div>
+
 <div id="timelineHolder" class="timeline-holder"></div>
-Hello World!
 <script>
     renderTimeline();
 </script>
+
+<div id="nav" class="nav">
+        <span class="menuButton default active">
+            <a href="#">Timeline</a>
+        </span>
+        <span id="nav_detail" class="menuButton default">
+            <a href="#">Activity Detail</a>
+        </span>
+        <span id="nav_stats" class="menuButton">
+            <a href="#">Stats</a>
+        </span>
+</div>
+<div id="contentPanel">
+
+</div>
+<script>
+    renderTimelineTree();
+</script>
+
 </body>
 </html>

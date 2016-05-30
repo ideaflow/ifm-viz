@@ -13,7 +13,7 @@ function renderTimeline() {
     $.ajax({
         type: 'GET',
         crossDomain : true,
-        url: 'http://localhost:8080/stubtimeline/task/trial',
+        url: 'http://localhost:8080/stubtimeline/natural/task/detailed',
         success: drawTimeline,
         error: handleError
     });
@@ -123,7 +123,7 @@ function drawEvents(stage, events, secondsPerUnit) {
 
 function drawEventLine(stage, event, secondsPerUnit) {
     var layer = new Kinetic.Layer();
-    var offset = Math.round(event.relativePosition / secondsPerUnit) + sideMargin;
+    var offset = Math.round(event.relativeStart / secondsPerUnit) + sideMargin;
     var tickHeight = 15;
     var tickMargin = 3;
 
@@ -140,7 +140,7 @@ function drawEventLine(stage, event, secondsPerUnit) {
     var tickLabel = new Kinetic.Text({
         x: offset,
         y: height - tickHeight + tickMargin,
-        text: formatShort(event.relativePosition),
+        text: formatShort(event.relativeStart),
         align: 'center',
         fontSize: 13,
         fontFamily: 'Calibri',
