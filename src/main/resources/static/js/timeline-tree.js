@@ -88,8 +88,11 @@ function renderIdeaFlowBand(treeNode) {
 }
 
     function renderTimeBandGroup(treeNode) {
-        return '<tr class="eventrow bandgroup"><td class="indent-two" colspan="6">TimeBand Group</td></tr>';
+        var tableContents = '<tr class="eventrow bandgroup" onmouseover="highlightBandById(\''+treeNode.id+'\');" onmouseout="restoreBandById(\''+treeNode.id+'\');">';
+        tableContents += '<td class="indent-two" colspan="6">TimeBand Group</td></tr>';
+        return tableContents;
     }
+
     function formatRelative(time) {
         var d = Number(time);
         var h = Math.floor(d / 3600);

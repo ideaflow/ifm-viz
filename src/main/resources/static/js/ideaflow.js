@@ -299,7 +299,6 @@ function createMainLine(tickHeight) {
 //RESPOND TO HIGHLIGHT REQUESTS FROM ELSEWHERE ON THE PAGE (Incoming API Calls Below)
 
 function highlightBandById(bandId) {
-
     var bandToHighlight = bandsById[bandId];
     if (bandToHighlight) {
         highlightBandGroup(bandToHighlight);
