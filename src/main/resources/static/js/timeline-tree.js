@@ -20,7 +20,6 @@ function drawTimelineTree(timeline){
 
 
     timeline.treeNodes.forEach(function(treeNode) {
-        tableContents += renderIndent(treeNode);
 
         if (treeNode.type === 'SEGMENT') {
             tableContents += renderSegment(treeNode);
@@ -36,27 +35,26 @@ function drawTimelineTree(timeline){
 
     tableContents += "</tbody></table></div>";
     $('#contentPanel').append(tableContents);
-
-    //var rows = 6,
-    //    cols = 7;
-    //
-    //for(var i = 0; i < rows; i++) {
-    //
-    //    for(var j = 0; j < cols; j++) {
-    //        var td = table.find('tr').eq(i).append('<td>hi'+j+'</td>');
-    //        table.find('tr').eq(i).find('td').eq(j).attr('data-row', i).attr('data-col', j);
-    //
-    //    }
-    //}
 }
 
 function renderIndent(treeNode) {
-    return '';
+    var styles = treeNode.bandType.toLowerCase() + 'type ';
+    if (treeNode.indentLevel == 1) {
+        styles +='indent-one';
+    } else if (treeNode.indentLevel == 2) {
+        styles +='indent-two';
+    }
+    else if (treeNode.indentLevel == 3) {
+        styles +='indent-three';
+    }
+
+    return '<td class="'+styles+'">&nbsp;&nbsp;&nbsp;</td>';
 }
 
 function renderSegment(treeNode) {
     var tableContents = '<tr class="subtask">';
-    tableContents += '<td></td><td>'+treeNode.start+'</td>';
+    tableContents += '<td class="indent-one"></td>';
+    tableContents += '<td>'+treeNode.start+'</td>';
     tableContents += '<td>'+formatRelative(treeNode.relativeStart)+'</td>';
 
     tableContents += '<td>Subtask</td>';
@@ -68,7 +66,9 @@ function renderSegment(treeNode) {
 
 function renderIdeaFlowBand(treeNode) {
     var tableContents = '<tr class="eventrow">';
-    tableContents += '<td class="'+treeNode.bandType.toLowerCase()+'type">&nbsp;&nbsp;&nbsp;</td>';
+
+    tableContents += renderIndent(treeNode);
+
     tableContents += '<td>'+treeNode.start+'</td>';
     tableContents += '<td>'+formatRelative(treeNode.relativeStart)+'</td>';
     tableContents += '<td>'+treeNode.bandType.capitalizeFirstLetter()+'</td>';
@@ -87,6 +87,9 @@ function renderIdeaFlowBand(treeNode) {
     return tableContents;
 }
 
+    function renderTimeBandGroup(treeNode) {
+        return '<tr class="eventrow bandgroup"><td class="indent-two" colspan="6">TimeBand Group</td></tr>';
+    }
     function formatRelative(time) {
         var d = Number(time);
         var h = Math.floor(d / 3600);
@@ -106,9 +109,6 @@ function renderIdeaFlowBand(treeNode) {
 
 
 
-    function renderTimeBandGroup(tableContents, treeNode) {
-    return '<td>group</td>';
-}
 
 //<td class="${timeEntry.bandType}type">
 //    &nbsp;&nbsp;&nbsp;

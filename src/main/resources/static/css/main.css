@@ -417,8 +417,16 @@ td.reworktype { background-color: #ffcb01; }
 /* line 44, ../../src/stylesheets/components/_table.scss */
 td.conflicttype { background-color: #ff0078; }
 
+/* line 44, ../../src/stylesheets/components/_table.scss */
+td.indent-one { border-left: 5px solid #111111; }
+td.indent-two { border-left:  30px solid #111111;}
+td.indent-three { border-left: 70px solid #111111;}
+
+tr.bandgroup { background-color: #EEEEEE; border-top: 2px solid #DDDDDD; }
+
+
 /* line 26, ../../src/stylesheets/components/_table.scss */
-tr.subtask { background-color: #AAAAAA; }
+tr.subtask { background-color: #AAAAAA; border-top: 2px solid #111111; }
 
 /* line 30, ../../src/stylesheets/components/_table.scss */
 tr.subtask td { color: white; }
