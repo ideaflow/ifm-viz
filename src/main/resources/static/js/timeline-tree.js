@@ -60,7 +60,7 @@ function bandStyle(treeNode) {
 }
 
 function renderSegment(treeNode) {
-    var tableContents = '<tr class="eventrow subtask">';
+    var tableContents = '<tr class="subtask" onmouseover="highlightEventById(\''+treeNode.id+'\');" onmouseout="restoreEventById(\''+treeNode.id+'\');">';
     tableContents += '<td class="indent-one"></td>';
     tableContents += '<td>'+treeNode.start+'</td>';
     tableContents += '<td>'+formatRelative(treeNode.relativeStart)+'</td>';
@@ -96,7 +96,7 @@ function renderIdeaFlowBand(treeNode) {
 }
 
     function renderTimeBandGroup(treeNode) {
-        var tableContents = '<tr class="eventrow" onmouseover="highlightBandById(\''+treeNode.id+'\');" onmouseout="restoreBandById(\''+treeNode.id+'\');">';
+        var tableContents = '<tr class="eventrow bandgroup" onmouseover="highlightBandById(\''+treeNode.id+'\');" onmouseout="restoreBandById(\''+treeNode.id+'\');">';
         tableContents += '<td class="indent-two" colspan="6">TimeBand Group</td></tr>';
         return tableContents;
     }
@@ -107,7 +107,7 @@ function renderIdeaFlowBand(treeNode) {
         tableContents += '<td>'+treeNode.start+'</td>';
         tableContents += '<td>'+formatRelative(treeNode.relativeStart)+'</td>';
 
-        tableContents += '<td>Event</td>';
+        tableContents += '<td>Note</td>';
         tableContents += '<td>'+treeNode.startingComment+'</td>';
         tableContents += '<td></td>';
         tableContents += '</tr>';
