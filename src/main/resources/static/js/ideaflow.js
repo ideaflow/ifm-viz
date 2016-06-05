@@ -49,15 +49,56 @@ function drawTimeline(timelineData) {
 function drawUngroupedTimebands(stage, firstSegment, secondsPerUnit) {
     firstSegment.ideaFlowBands.forEach(function(band) {
         if (band.type != "PROGRESS") {
-            drawTimebandGroup(stage, [band], secondsPerUnit);
+            var groupLayer = new Kinetic.Layer();
+            var bandGroup = drawBandGroup(groupLayer, band, secondsPerUnit);
+            bandGroup.layer.on('mouseover touchstart', function() { highlightBandGroup(bandGroup) });
+            bandGroup.layer.on('mouseout touchend', function() { restoreBandGroup(bandGroup) });
+            stage.add(groupLayer);
         }
     });
 }
 
 function drawGroupedTimebands(stage, firstSegment, secondsPerUnit) {
     firstSegment.timeBandGroups.forEach(function(group) {
-        drawTimebandGroup(stage, group.linkedTimeBands, secondsPerUnit);
+        var groupLayer = new Kinetic.Layer();
+        var groupInfo = { id: group.id, bandInfos: [], layer: groupLayer };
+
+        group.linkedTimeBands.forEach(function(band) {
+            var bandGroup = drawBandGroup(groupLayer, band, secondsPerUnit);
+            groupInfo.bandInfos = groupInfo.bandInfos.concat(bandGroup.bandInfos);
+        });
+
+        groupLayer.on('mouseover touchstart', function() { highlightBandGroup(groupInfo) });
+        groupLayer.on('mouseout touchend', function() { restoreBandGroup(groupInfo) });
+        stage.add(groupLayer);
+
+        bandsById[group.id] = groupInfo;
     });
+}
+
+
+function drawBandGroup(groupLayer, band, secondsPerUnit) {
+    var bandGroup = createBandGroup(groupLayer, band, secondsPerUnit);
+    bandsById[bandGroup.id] = bandGroup;
+
+    band.nestedBands.forEach(function(nestedBand) {
+        var nestedBandGroup = createBandGroup(groupLayer, nestedBand, secondsPerUnit);
+        bandGroup.bandInfos = bandGroup.bandInfos.concat(nestedBandGroup.bandInfos);
+        bandsById[nestedBandGroup.id] = nestedBandGroup;
+    });
+
+    return bandGroup;
+}
+
+function createBandGroup(groupLayer, band, secondsPerUnit) {
+    var groupInfo = { id: band.id, bandInfos: [], layer: groupLayer };
+
+    var colorBand = drawBand(groupLayer, band, secondsPerUnit);
+    var bandInfo = { data: band, rect: colorBand };
+
+    groupInfo.bandInfos.push(bandInfo);
+
+    return groupInfo;
 }
 
 function drawTimebandGroup(stage, bands, secondsPerUnit) {
@@ -66,16 +107,16 @@ function drawTimebandGroup(stage, bands, secondsPerUnit) {
 
     bands.forEach(function(band) {
         if (band.type != "PROGRESS") {
-            var colorBand = drawBand(groupLayer, band, secondsPerUnit);
-            var bandInfo = { data: band, rect: colorBand };
-            groupInfo.bandInfos.push(bandInfo);
-            bandsById[band.id] = groupInfo;
+
+            var bandGroup = createBandGroup(groupLayer, band, secondsPerUnit);
+            groupInfo.bandInfos = groupInfo.bandInfos.concat(bandGroup.bandInfos);
+            bandsById[bandGroup.id] = bandGroup;
 
             band.nestedBands.forEach(function(nestedBand) {
-                var colorBand = drawBand(groupLayer, nestedBand, secondsPerUnit);
-                var nestedBandInfo = { data: nestedBand, rect: colorBand };
-                groupInfo.bandInfos.push(nestedBandInfo);
-                bandsById[nestedBand.id] = groupInfo;
+                var nestedBandGroup = createBandGroup(groupLayer, nestedBand, secondsPerUnit);
+                groupInfo.bandInfos = groupInfo.bandInfos.concat(nestedBandGroup.bandInfos);
+                bandGroup.bandInfos = bandGroup.bandInfos.concat(nestedBandGroup.bandInfos);
+                bandsById[nestedBandGroup.id] = nestedBandGroup;
             });
         }
     });
@@ -84,7 +125,13 @@ function drawTimebandGroup(stage, bands, secondsPerUnit) {
     groupLayer.on('mouseout touchend', function() { restoreBandGroup(groupInfo) });
 
     stage.add(groupLayer);
+    return groupInfo;
 }
+
+
+
+
+
 
 function highlightBandGroup(groupInfo) {
     groupInfo.bandInfos.forEach(function(bandInfo) {
