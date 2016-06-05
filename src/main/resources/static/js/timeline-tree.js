@@ -65,7 +65,7 @@ function renderSegment(treeNode) {
 }
 
 function renderIdeaFlowBand(treeNode) {
-    var tableContents = '<tr class="eventrow">';
+    var tableContents = '<tr class="eventrow" onmouseover="highlightBandById('+treeNode.id+');" onmouseout="restoreBandById('+treeNode.id+');">';
 
     tableContents += renderIndent(treeNode);
 

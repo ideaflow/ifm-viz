@@ -9,6 +9,10 @@ var height = 180;
 var width = 800;
 
 
+//DATA STRUCTURES TO SUPPORT HIGHLIGHT RESPONSES
+
+var bandsById = [];
+
 function renderTimeline() {
     $.ajax({
         type: 'GET',
@@ -65,11 +69,13 @@ function drawTimebandGroup(stage, bands, secondsPerUnit) {
             var colorBand = drawBand(groupLayer, band, secondsPerUnit);
             var bandInfo = { data: band, rect: colorBand };
             groupInfo.bandInfos.push(bandInfo);
+            bandsById[band.id] = groupInfo;
 
             band.nestedBands.forEach(function(nestedBand) {
                 var colorBand = drawBand(groupLayer, nestedBand, secondsPerUnit);
-                var bandInfo = { data: nestedBand, rect: colorBand };
-                groupInfo.bandInfos.push(bandInfo);
+                var nestedBandInfo = { data: nestedBand, rect: colorBand };
+                groupInfo.bandInfos.push(nestedBandInfo);
+                bandsById[nestedBand.id] = groupInfo;
             });
         }
     });
@@ -243,3 +249,20 @@ function createMainLine(tickHeight) {
     });
 }
 
+//RESPOND TO HIGHLIGHT REQUESTS FROM ELSEWHERE ON THE PAGE (Incoming API Calls Below)
+
+function highlightBandById(bandId) {
+
+    var bandToHighlight = bandsById[bandId];
+    if (bandToHighlight) {
+        highlightBandGroup(bandToHighlight);
+    }
+}
+
+function restoreBandById(bandId) {
+
+    var bandToRestore = bandsById[bandId];
+    if (bandToRestore) {
+        restoreBandGroup(bandToRestore);
+    }
+}
