@@ -62,7 +62,7 @@ function bandStyle(treeNode) {
 function renderSegment(treeNode) {
     var tableContents = '<tr class="subtask" onmouseover="highlightEventById(\''+treeNode.id+'\');" onmouseout="restoreEventById(\''+treeNode.id+'\');">';
     tableContents += '<td class="indent-one"></td>';
-    tableContents += '<td>'+treeNode.start+'</td>';
+    tableContents += '<td>'+formatDate(treeNode.start)+'</td>';
     tableContents += '<td>'+formatRelative(treeNode.relativeStart)+'</td>';
 
     tableContents += '<td>Subtask</td>';
@@ -77,7 +77,7 @@ function renderIdeaFlowBand(treeNode) {
 
     tableContents += '<td class="'+indentStyle(treeNode)+bandStyle(treeNode)+'">&nbsp;&nbsp;&nbsp;</td>';
 
-    tableContents += '<td>'+treeNode.start+'</td>';
+    tableContents += '<td>'+formatDate(treeNode.start)+'</td>';
     tableContents += '<td>'+formatRelative(treeNode.relativeStart)+'</td>';
     tableContents += '<td>'+treeNode.bandType.capitalizeFirstLetter()+'</td>';
 
@@ -120,6 +120,10 @@ function renderIdeaFlowBand(treeNode) {
         var m = Math.floor(d % 3600 / 60);
 
         return ( h + ":" + (m < 10 ? "0" : "") + m );
+    }
+
+    function formatDate(dateStr) {
+        return dateStr;
     }
 
     function formatTime(duration) {
