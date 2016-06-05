@@ -12,6 +12,7 @@ var width = 800;
 //DATA STRUCTURES TO SUPPORT HIGHLIGHT RESPONSES
 
 var bandsById = [];
+var eventsById = [];
 
 function renderTimeline() {
     $.ajax({
@@ -101,36 +102,6 @@ function createBandGroup(groupLayer, band, secondsPerUnit) {
     return groupInfo;
 }
 
-function drawTimebandGroup(stage, bands, secondsPerUnit) {
-    var groupLayer = new Kinetic.Layer();
-    var groupInfo = { bandInfos: [], layer: groupLayer };
-
-    bands.forEach(function(band) {
-        if (band.type != "PROGRESS") {
-
-            var bandGroup = createBandGroup(groupLayer, band, secondsPerUnit);
-            groupInfo.bandInfos = groupInfo.bandInfos.concat(bandGroup.bandInfos);
-            bandsById[bandGroup.id] = bandGroup;
-
-            band.nestedBands.forEach(function(nestedBand) {
-                var nestedBandGroup = createBandGroup(groupLayer, nestedBand, secondsPerUnit);
-                groupInfo.bandInfos = groupInfo.bandInfos.concat(nestedBandGroup.bandInfos);
-                bandGroup.bandInfos = bandGroup.bandInfos.concat(nestedBandGroup.bandInfos);
-                bandsById[nestedBandGroup.id] = nestedBandGroup;
-            });
-        }
-    });
-
-    groupLayer.on('mouseover touchstart', function() { highlightBandGroup(groupInfo) });
-    groupLayer.on('mouseout touchend', function() { restoreBandGroup(groupInfo) });
-
-    stage.add(groupLayer);
-    return groupInfo;
-}
-
-
-
-
 
 
 function highlightBandGroup(groupInfo) {
@@ -169,6 +140,8 @@ function drawBand(layer, band, secondsPerUnit) {
 function drawEvents(stage, events, secondsPerUnit) {
     events.forEach(function(event) {
         var eventInfo = drawEventLine(stage, event, secondsPerUnit);
+        eventsById[event.id] = eventInfo;
+
         eventInfo.layer.on('mouseover touchstart', function() { highlightEventLine(eventInfo) });
         eventInfo.layer.on('mouseout touchend', function() { restoreEventLine(eventInfo) });
     });
@@ -310,5 +283,20 @@ function restoreBandById(bandId) {
     var bandToRestore = bandsById[bandId];
     if (bandToRestore) {
         restoreBandGroup(bandToRestore);
+    }
+}
+
+function highlightEventById(eventId) {
+    var eventToHighlight = eventsById[eventId];
+    if (eventToHighlight) {
+        highlightEventLine(eventToHighlight);
+    }
+}
+
+function restoreEventById(eventId) {
+
+    var eventToRestore = eventsById[eventId];
+    if (eventToRestore) {
+        restoreEventLine(eventToRestore);
     }
 }
