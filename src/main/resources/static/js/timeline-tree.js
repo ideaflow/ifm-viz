@@ -103,7 +103,7 @@ function renderIdeaFlowBand(treeNode) {
 
     function renderEvent(treeNode) {
         var tableContents = '<tr class="eventrow" onmouseover="highlightEventById(\''+treeNode.id+'\');" onmouseout="restoreEventById(\''+treeNode.id+'\');">';
-        tableContents += '<td class="'+indentStyle(treeNode)+'"><hr/></td>';
+        tableContents += '<td class="eventtype '+indentStyle(treeNode)+'"><hr/></td>';
         tableContents += '<td>'+treeNode.start+'</td>';
         tableContents += '<td>'+formatRelative(treeNode.relativeStart)+'</td>';
 

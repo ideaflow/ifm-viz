@@ -417,6 +417,10 @@ td.reworktype { background-color: #ffcb01; }
 /* line 44, ../../src/stylesheets/components/_table.scss */
 td.conflicttype { background-color: #ff0078; }
 
+td.progresstype { background-color: #ffffff; }
+
+td.eventtype { background-color: #ffffff; }
+
 /* line 44, ../../src/stylesheets/components/_table.scss */
 td.indent-one { border-left: 5px solid #111111; }
 td.indent-two { border-left:  30px solid #111111;}
@@ -431,7 +435,9 @@ tr.subtask { background-color: #AAAAAA; border-top: 2px solid #111111; }
 /* line 30, ../../src/stylesheets/components/_table.scss */
 tr.subtask td { color: white; }
 
+tr.eventrow:hover { background-color: #d3e0ff; }
 
+tr.subtask:hover { background-color: #999999; }
 
 
 /* line 50, ../../src/stylesheets/components/_table.scss */
