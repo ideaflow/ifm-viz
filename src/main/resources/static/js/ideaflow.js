@@ -14,11 +14,21 @@ var width = 800;
 var bandsById = [];
 var eventsById = [];
 
+function renderTaskInfo() {
+    $.ajax({
+        type: 'GET',
+        crossDomain : true,
+        url: 'http://localhost:8080/task?taskName=detail',
+        success: populateTaskInfo,
+        error: handleError
+    });
+}
+
 function renderTimeline() {
     $.ajax({
         type: 'GET',
         crossDomain : true,
-        url: 'http://localhost:8080/stubtimeline/natural/task/detailed',
+        url: 'http://localhost:8080/timeline/band?taskName=detail', //trialAndError, detail
         success: drawTimeline,
         error: handleError
     });
@@ -26,6 +36,15 @@ function renderTimeline() {
 
 function handleError(err) {
     console.log("AJAX error in request: " + JSON.stringify(err, null, 2));
+}
+
+function populateTaskInfo(taskInfo) {
+    $('#taskDate').append(formatLongTime(taskInfo.creationDate));
+    $('#taskDescription').append(taskInfo.name + ' : '+taskInfo.description);
+}
+
+function formatLongTime(timeStr) {
+    return moment(timeStr).format("MMMM DD YYYY, h:mm A");
 }
 
 function drawTimeline(timelineData) {
@@ -36,19 +55,18 @@ function drawTimeline(timelineData) {
         height: height
     });
 
-    var firstSegment = timelineData.timelineSegments[0];
-    var secondsPerUnit = getSecondsPerUnit(firstSegment);
+    var secondsPerUnit = getSecondsPerUnit(timelineData);
 
-    drawUngroupedTimebands(stage, firstSegment, secondsPerUnit);
-    drawGroupedTimebands(stage, firstSegment, secondsPerUnit);
-    drawMainTimeline(stage, formatShort(0), formatShort(getEndOfTimeline(firstSegment)));
+    drawUngroupedTimebands(stage, timelineData, secondsPerUnit);
+    drawGroupedTimebands(stage, timelineData, secondsPerUnit);
+    drawMainTimeline(stage, formatShort(0), formatShort(getEndOfTimeline(timelineData)));
 
-    drawEvents(stage, firstSegment.events, secondsPerUnit);
+    drawEvents(stage, timelineData.events, secondsPerUnit);
 }
 
 
-function drawUngroupedTimebands(stage, firstSegment, secondsPerUnit) {
-    firstSegment.ideaFlowBands.forEach(function(band) {
+function drawUngroupedTimebands(stage, timelineData, secondsPerUnit) {
+    timelineData.ideaFlowBands.forEach(function(band) {
         if (band.type != "PROGRESS") {
             var groupLayer = new Kinetic.Layer();
             var bandGroup = drawBandGroup(groupLayer, band, secondsPerUnit);
@@ -59,8 +77,8 @@ function drawUngroupedTimebands(stage, firstSegment, secondsPerUnit) {
     });
 }
 
-function drawGroupedTimebands(stage, firstSegment, secondsPerUnit) {
-    firstSegment.timeBandGroups.forEach(function(group) {
+function drawGroupedTimebands(stage, timelineData, secondsPerUnit) {
+    timelineData.timeBandGroups.forEach(function(group) {
         var groupLayer = new Kinetic.Layer();
         var groupInfo = { id: group.id, bandInfos: [], layer: groupLayer };
 
@@ -153,13 +171,19 @@ function drawEventLine(stage, event, secondsPerUnit) {
     var tickHeight = 15;
     var tickMargin = 3;
 
+    var strokeWidth = 2;
+    if (event.eventType === 'SUBTASK') {
+        strokeWidth = 4;
+    }
+
+
     var eventLine = new Kinetic.Line({
         points: [
             [offset, topMargin],
             [offset, height - bottomMargin + tickHeight]
         ],
         stroke: 'gray',
-        strokeWidth: 2,
+        strokeWidth: strokeWidth,
         lineCap: 'square'
     });
 
@@ -215,12 +239,12 @@ function formatShort(duration) {
     return ( h + ":" + (m < 10 ? "0" : "") + m);
 }
 
-function getEndOfTimeline(segment) {
-    return segment.relativeStart + segment.duration;
+function getEndOfTimeline(timelineData) {
+    return timelineData.relativeStart + timelineData.duration;
 }
 
-function getSecondsPerUnit(segment) {
-    return (getEndOfTimeline(segment) / (width - (2 * sideMargin)));
+function getSecondsPerUnit(timelineData) {
+    return (getEndOfTimeline(timelineData) / (width - (2 * sideMargin)));
 }
 
 

@@ -24,6 +24,8 @@
 
     <script type="text/javascript" src="../visualizer/js/lib/jquery.min.js"></script>
     <script src="../visualizer/js/lib/kinetic-v4.7.4.min.js"></script>
+    <script src="../visualizer/js/lib/moment.min.js"></script>
+
     <script src="../visualizer/js/ideaflow.js"></script>
     <script src="../visualizer/js/timeline-tree.js"></script>
 
@@ -32,8 +34,8 @@
 <div class="header">
     <div class="nav option1">
         <ul>
-            <li class="active"><a href="#">Nov 4th, 2015</a></li>
-            <li><a href="#">My Task Description</a></li>
+            <li class="active"><a href="#"><span id="taskDate"></span></a></li>
+            <li><a href="#"><span id="taskDescription"></span></a></li>
         </ul>
         <img src="../visualizer/images/flow.svg" alt="Idea Flow"/>
     </div>
@@ -59,6 +61,7 @@
 
 </div>
 <script>
+    renderTaskInfo();
     renderTimelineTree();
 </script>
 

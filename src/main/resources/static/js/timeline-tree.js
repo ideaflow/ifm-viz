@@ -8,7 +8,7 @@ function renderTimelineTree() {
     $.ajax({
         type: 'GET',
         crossDomain : true,
-        url: 'http://localhost:8080/stubtimeline/tree/task/detailed',
+        url: 'http://localhost:8080/timeline/tree?taskName=detail',
         success: drawTimelineTree,
         error: handleError
     });
@@ -89,7 +89,7 @@ function renderIdeaFlowBand(treeNode) {
     } else {
         tableContents += '<td>'+treeNode.startingComment+'</td>';
     }
-    tableContents += '<td>'+formatTime(treeNode.duration)+'</td>';
+    tableContents += '<td>'+formatDuration(treeNode.duration)+'</td>';
 
     tableContents += '</tr>';
     return tableContents;
@@ -104,7 +104,7 @@ function renderIdeaFlowBand(treeNode) {
     function renderEvent(treeNode) {
         var tableContents = '<tr class="eventrow" onmouseover="highlightEventById(\''+treeNode.id+'\');" onmouseout="restoreEventById(\''+treeNode.id+'\');">';
         tableContents += '<td class="eventtype '+indentStyle(treeNode)+'"><hr/></td>';
-        tableContents += '<td>'+treeNode.start+'</td>';
+        tableContents += '<td>'+formatDate(treeNode.start)+'</td>';
         tableContents += '<td>'+formatRelative(treeNode.relativeStart)+'</td>';
 
         tableContents += '<td>Note</td>';
@@ -123,10 +123,10 @@ function renderIdeaFlowBand(treeNode) {
     }
 
     function formatDate(dateStr) {
-        return dateStr;
+        return moment(dateStr).format("MM/DD  h:mm:ss A");
     }
 
-    function formatTime(duration) {
+    function formatDuration(duration) {
         var d = Number(duration);
         var h = Math.floor(d / 3600);
         var m = Math.floor(d % 3600 / 60);
