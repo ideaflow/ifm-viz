@@ -5,10 +5,11 @@
     };
 
 function renderTimelineTree() {
+    var param = url('#taskId');
     $.ajax({
         type: 'GET',
         crossDomain : true,
-        url: 'http://localhost:8080/timeline/tree?taskName=detail',
+        url: 'http://localhost:8080/timeline/tree?taskId='+param,
         success: drawTimelineTree,
         error: handleError
     });
@@ -17,7 +18,6 @@ function renderTimelineTree() {
 function drawTimelineTree(timeline){
 
     var tableContents = '<div class="tabcontent"><table class="tabular"><tbody>';
-
 
     timeline.treeNodes.forEach(function(treeNode) {
 

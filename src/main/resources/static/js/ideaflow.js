@@ -15,20 +15,22 @@ var bandsById = [];
 var eventsById = [];
 
 function renderTaskInfo() {
+    var param = url('#taskId');
     $.ajax({
         type: 'GET',
         crossDomain : true,
-        url: 'http://localhost:8080/task?taskName=detail',
+        url: 'http://localhost:8080/task/id/'+param,
         success: populateTaskInfo,
         error: handleError
     });
 }
 
 function renderTimeline() {
+    var param = url('#taskId');
     $.ajax({
         type: 'GET',
         crossDomain : true,
-        url: 'http://localhost:8080/timeline/band?taskName=detail', //trialAndError, detail
+        url: 'http://localhost:8080/timeline/band?taskId='+param, //trialAndError, detail
         success: drawTimeline,
         error: handleError
     });
