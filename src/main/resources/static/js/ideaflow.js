@@ -140,8 +140,8 @@ function restoreBandGroup(groupInfo) {
 }
 
 function drawBand(layer, band, secondsPerUnit) {
-    var offset = Math.round(band.relativeStart / secondsPerUnit) + sideMargin;
-    var size = Math.round(band.duration / secondsPerUnit);
+    var offset = Math.round(band.relativePositionInSeconds / secondsPerUnit) + sideMargin;
+    var size = Math.round(band.durationInSeconds / secondsPerUnit);
 
     var colorBand = new Kinetic.Rect({
         x: offset,
@@ -169,7 +169,7 @@ function drawEvents(stage, events, secondsPerUnit) {
 
 function drawEventLine(stage, event, secondsPerUnit) {
     var layer = new Kinetic.Layer();
-    var offset = Math.round(event.relativeStart / secondsPerUnit) + sideMargin;
+    var offset = Math.round(event.relativePositionInSeconds / secondsPerUnit) + sideMargin;
     var tickHeight = 15;
     var tickMargin = 3;
 
@@ -192,7 +192,7 @@ function drawEventLine(stage, event, secondsPerUnit) {
     var tickLabel = new Kinetic.Text({
         x: offset,
         y: height - tickHeight + tickMargin,
-        text: formatShort(event.relativeStart),
+        text: formatShort(event.relativePositionInSeconds),
         align: 'center',
         fontSize: 13,
         fontFamily: 'Calibri',
@@ -242,7 +242,7 @@ function formatShort(duration) {
 }
 
 function getEndOfTimeline(timelineData) {
-    return timelineData.relativeStart + timelineData.duration;
+    return timelineData.relativePositionInSeconds + timelineData.durationInSeconds;
 }
 
 function getSecondsPerUnit(timelineData) {

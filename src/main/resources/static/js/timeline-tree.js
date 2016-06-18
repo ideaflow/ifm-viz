@@ -63,7 +63,7 @@ function renderSegment(treeNode) {
     var tableContents = '<tr class="subtask" onmouseover="highlightEventById(\''+treeNode.id+'\');" onmouseout="restoreEventById(\''+treeNode.id+'\');">';
     tableContents += '<td class="indent-one"></td>';
     tableContents += '<td>'+formatDate(treeNode.start)+'</td>';
-    tableContents += '<td>'+formatRelative(treeNode.relativeStart)+'</td>';
+    tableContents += '<td>'+formatRelative(treeNode.relativePositionInSeconds)+'</td>';
 
     tableContents += '<td>Subtask</td>';
     tableContents += '<td>'+treeNode.startingComment+'</td>';
@@ -78,7 +78,7 @@ function renderIdeaFlowBand(treeNode) {
     tableContents += '<td class="'+indentStyle(treeNode)+bandStyle(treeNode)+'">&nbsp;&nbsp;&nbsp;</td>';
 
     tableContents += '<td>'+formatDate(treeNode.start)+'</td>';
-    tableContents += '<td>'+formatRelative(treeNode.relativeStart)+'</td>';
+    tableContents += '<td>'+formatRelative(treeNode.relativePositionInSeconds)+'</td>';
     tableContents += '<td>'+treeNode.bandType.capitalizeFirstLetter()+'</td>';
 
     if (treeNode.bandType == 'CONFLICT') {
@@ -89,7 +89,7 @@ function renderIdeaFlowBand(treeNode) {
     } else {
         tableContents += '<td>'+treeNode.startingComment+'</td>';
     }
-    tableContents += '<td>'+formatDuration(treeNode.duration)+'</td>';
+    tableContents += '<td>'+formatDuration(treeNode.durationInSeconds)+'</td>';
 
     tableContents += '</tr>';
     return tableContents;
@@ -105,7 +105,7 @@ function renderIdeaFlowBand(treeNode) {
         var tableContents = '<tr class="eventrow" onmouseover="highlightEventById(\''+treeNode.id+'\');" onmouseout="restoreEventById(\''+treeNode.id+'\');">';
         tableContents += '<td class="eventtype '+indentStyle(treeNode)+'"><hr/></td>';
         tableContents += '<td>'+formatDate(treeNode.start)+'</td>';
-        tableContents += '<td>'+formatRelative(treeNode.relativeStart)+'</td>';
+        tableContents += '<td>'+formatRelative(treeNode.relativePositionInSeconds)+'</td>';
 
         tableContents += '<td>Note</td>';
         tableContents += '<td>'+treeNode.startingComment+'</td>';
