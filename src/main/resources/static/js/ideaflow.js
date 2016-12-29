@@ -19,7 +19,9 @@ function renderTaskInfo() {
     $.ajax({
         type: 'GET',
         crossDomain : true,
-        url: 'http://localhost:8080/task/id/'+param,
+        headers: {"X-API-KEY": "ed88ceeb-b0c4-4bd1-bde1-97731ec64a17",
+                  "Origin": "localhost:8080"},
+        url: 'http://ifm-publisher.herokuapp.com/task/id/'+param,
         success: populateTaskInfo,
         error: handleError
     });
@@ -30,7 +32,8 @@ function renderTimeline() {
     $.ajax({
         type: 'GET',
         crossDomain : true,
-        url: 'http://localhost:8080/timeline/band?taskId='+param, //trialAndError, detail
+        headers: {"X-API-KEY": "ed88ceeb-b0c4-4bd1-bde1-97731ec64a17"},
+        url: 'http://ifm-publisher.herokuapp.com/ideaflow/timeline/task/'+param, //trialAndError, detail
         success: drawTimeline,
         error: handleError
     });

@@ -30,15 +30,15 @@ public class VisualizerController {
 
     @RequestMapping("/")
     public String home(Model model) {
-        model.addAttribute("demoInput", new DemoInput("Some Value"));
+       // model.addAttribute("demoInput", new DemoInput("Some Value"));
         return "home";
     }
 
     @Consumes(MediaType.APPLICATION_JSON)
     @RequestMapping(value="/submitDemo", method=RequestMethod.POST)
     public String demoSubmit(@ModelAttribute("demoInput") DemoInput demoInput, Model model) {
-        DemoResult result = new DemoResult(demoInput.getInputValue() + " Result");
-        model.addAttribute("demoResult", result);
+//        DemoResult result = new DemoResult(demoInput.getInputValue() + " Result");
+//        model.addAttribute("demoResult", result);
         return "result";
     }
 
