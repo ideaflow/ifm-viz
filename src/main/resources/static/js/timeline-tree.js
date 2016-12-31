@@ -5,14 +5,15 @@
     };
 
 function renderTimelineTree() {
-    var param = url('#taskId');
-    $.ajax({
-        type: 'GET',
-        crossDomain : true,
-        url: 'http://localhost:8080/timeline/tree?taskId='+param,
-        success: drawTimelineTree,
-        error: handleError
-    });
+    //var param = url('#taskId');
+    //$.ajax({
+    //    type: 'GET',
+    //    crossDomain : true,
+    //    headers: {"X-API-KEY": "c02296fb-174b-4075-b7a1-acde34798777"},
+    //    url: 'http://localhost:8080/ideaflow/timeline/task/'+param,
+    //    success: drawTimelineTree,
+    //    error: handleError
+    //});
 }
 
 function drawTimelineTree(timeline){

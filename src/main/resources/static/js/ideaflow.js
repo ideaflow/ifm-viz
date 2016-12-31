@@ -19,9 +19,8 @@ function renderTaskInfo() {
     $.ajax({
         type: 'GET',
         crossDomain : true,
-        headers: {"X-API-KEY": "ed88ceeb-b0c4-4bd1-bde1-97731ec64a17",
-                  "Origin": "localhost:8080"},
-        url: 'http://ifm-publisher.herokuapp.com/task/id/'+param,
+        headers: {"X-API-KEY": "ed88ceeb-b0c4-4bd1-bde1-97731ec64a17"},
+        url: 'http://om-ideaflow.herokuapp.com/ideaflow/task/id/'+param,
         success: populateTaskInfo,
         error: handleError
     });
@@ -33,7 +32,7 @@ function renderTimeline() {
         type: 'GET',
         crossDomain : true,
         headers: {"X-API-KEY": "ed88ceeb-b0c4-4bd1-bde1-97731ec64a17"},
-        url: 'http://ifm-publisher.herokuapp.com/ideaflow/timeline/task/'+param, //trialAndError, detail
+        url: 'http://om-ideaflow.herokuapp.com/ideaflow/timeline/task/'+param, //trialAndError, detail
         success: drawTimeline,
         error: handleError
     });
@@ -52,7 +51,7 @@ function formatLongTime(timeStr) {
     return moment(timeStr).format("MMMM DD YYYY, h:mm A");
 }
 
-function drawTimeline(timelineData) {
+function drawTimeline(timelineResponse) {
 
     stage = new Kinetic.Stage({
         container: 'timelineHolder',
@@ -60,10 +59,12 @@ function drawTimeline(timelineData) {
         height: height
     });
 
+    var timelineData = timelineResponse.timeline;
+
     var secondsPerUnit = getSecondsPerUnit(timelineData);
 
     drawUngroupedTimebands(stage, timelineData, secondsPerUnit);
-    drawGroupedTimebands(stage, timelineData, secondsPerUnit);
+    //drawGroupedTimebands(stage, timelineData, secondsPerUnit);
     drawMainTimeline(stage, formatShort(0), formatShort(getEndOfTimeline(timelineData)));
 
     drawEvents(stage, timelineData.events, secondsPerUnit);
@@ -105,11 +106,11 @@ function drawBandGroup(groupLayer, band, secondsPerUnit) {
     var bandGroup = createBandGroup(groupLayer, band, secondsPerUnit);
     bandsById[bandGroup.id] = bandGroup;
 
-    band.nestedBands.forEach(function(nestedBand) {
-        var nestedBandGroup = createBandGroup(groupLayer, nestedBand, secondsPerUnit);
-        bandGroup.bandInfos = bandGroup.bandInfos.concat(nestedBandGroup.bandInfos);
-        bandsById[nestedBandGroup.id] = nestedBandGroup;
-    });
+    //band.nestedBands.forEach(function(nestedBand) {
+    //    var nestedBandGroup = createBandGroup(groupLayer, nestedBand, secondsPerUnit);
+    //    bandGroup.bandInfos = bandGroup.bandInfos.concat(nestedBandGroup.bandInfos);
+    //    bandsById[nestedBandGroup.id] = nestedBandGroup;
+    //});
 
     return bandGroup;
 }
@@ -226,7 +227,7 @@ function restoreEventLine(eventInfo) {
 
 
 function lookupBandColors(bandType) {
-    if (bandType == 'CONFLICT') {
+    if (bandType == 'TROUBLESHOOTING') {
         return ['#ff0078', '#FF90D1', '#FFDEF6']
     } else if (bandType == 'LEARNING') {
         return ['#520ce8', '#9694E8', '#EDE2FD']
